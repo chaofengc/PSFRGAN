@@ -2,8 +2,7 @@
 
 > We only provide test codes at this time. 
 
-[Progressive Semantic-Aware Style Transformation for Blind Face Restoration]()
-
+[Progressive Semantic-Aware Style Transformation for Blind Face Restoration]()  
 [Chaofeng Chen](https://chaofengc.github.io), [Xiaoming Li](https://csxmli2016.github.io/), [Lingbo Yang](https://lotayou.github.io), Xianhui Lin, [Lei Zhang](https://www4.comp.polyu.edu.hk/~cslzhang/), [Kwan-Yee K. Wong](https://i.cs.hku.hk/~kykwong/)
 
 ## Getting Started
@@ -24,8 +23,7 @@ Coming soon.
 ### Test
 
 #### Test single image
-Run the following script to enhance face(s) in single input
-
+Run the following script to enhance face(s) in single input  
 `python test_enhance_single_unalign.py --test_img_path ./test_dir/Solvay_conference_1927.jpg --results_dir solvay_test`
 
 This script do the following things:
@@ -34,15 +32,12 @@ This script do the following things:
 - Paste then enhanced faces back to the original image `solvay_test/hq_final.jpg`  
 
 #### Test image folder 
-To test multiple images, we first crop out all the faces and align them use the following script.
-
-`python align_and_crop_dir.py --src_dir test_dir --results_dir test_align_results`
-
-For images, i.e., `multiface_test.jpg`, contain multiple faces, the aligned faces will be stored as `test_align_results/multiface_test_{face_index}.jpg`
+To test multiple images, we first crop out all the faces and align them use the following script.  
+```python align_and_crop_dir.py --src_dir test_dir --results_dir test_align_results```
+For images, i.e., `multiface_test.jpg`, contain multiple faces, the aligned faces will be stored as `test_align_results/multiface_test_{face_index}.jpg`  
 
 And then parse the aligned faces and enhance them with
-
-`python test_enhance_dir_align.py --dataroot test_align_results --results_dir test_enhance_results`
+```python test_enhance_dir_align.py --dataroot test_align_results --results_dir test_enhance_results```
 
 This is used to test a large amounts of data, so we do not paste the faces back.
 
