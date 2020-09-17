@@ -33,12 +33,11 @@ This script do the following things:
 
 #### Test image folder 
 To test multiple images, we first crop out all the faces and align them use the following script.  
-```python align_and_crop_dir.py --src_dir test_dir --results_dir test_align_results```
+```python align_and_crop_dir.py --src_dir test_dir --results_dir test_align_results```  
 For images, i.e., `multiface_test.jpg`, contain multiple faces, the aligned faces will be stored as `test_align_results/multiface_test_{face_index}.jpg`  
 
-And then parse the aligned faces and enhance them with
-```python test_enhance_dir_align.py --dataroot test_align_results --results_dir test_enhance_results```
-
+And then parse the aligned faces and enhance them with  
+```python test_enhance_dir_align.py --dataroot test_align_results --results_dir test_enhance_results```  
 This is used to test a large amounts of data, so we do not paste the faces back.
 
 ## Citation
