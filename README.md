@@ -20,9 +20,7 @@
 ### Download Pretrain Models and Dataset
 Coming soon.
 
-### Test
-
-#### Test single image
+### Test single image
 Run the following script to enhance face(s) in single input  
 `python test_enhance_single_unalign.py --test_img_path ./test_dir/Solvay_conference_1927.jpg --results_dir solvay_test`
 
@@ -31,7 +29,7 @@ This script do the following things:
 - Parse these faces and then enhance them, results stored at `solvay_test/ParseMaps` and `solvay_test/HQ`  
 - Paste then enhanced faces back to the original image `solvay_test/hq_final.jpg`  
 
-#### Test image folder 
+### Test image folder 
 To test multiple images, we first crop out all the faces and align them use the following script.  
 ```python align_and_crop_dir.py --src_dir test_dir --results_dir test_align_results```  
 For images, i.e., `multiface_test.jpg`, contain multiple faces, the aligned faces will be stored as `test_align_results/multiface_test_{face_index}.jpg`  
