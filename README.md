@@ -35,7 +35,7 @@ To test multiple images, we first crop out all the faces and align them use the 
 
 ```python align_and_crop_dir.py --src_dir test_dir --results_dir test_align_results```  
 
-For images, i.e., `multiface_test.jpg`, contain multiple faces, the aligned faces will be stored as `multiface_test_{face_index}.jpg`  
+For images (*e.g.* `multiface_test.jpg`) contain multiple faces, the aligned faces will be stored as `multiface_test_{face_index}.jpg`  
 
 And then parse the aligned faces and enhance them with  
 
