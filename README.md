@@ -23,13 +23,14 @@ Coming soon.
 ### Test single image
 Run the following script to enhance face(s) in single input  
 ```
-python test_enhance_single_unalign.py --test_img_path ./test_dir/Solvay_conference_1927.jpg --results_dir solvay_test
+python test_enhance_single_unalign.py --test_img_path ./test_dir/Solvay_conference_1927.jpg --results_dir solvay_test --test_upscale 1
 ```
 
 This script do the following things:
 - Crop and align all the faces from input image, stored at `solvay_test/LQ_faces`  
 - Parse these faces and then enhance them, results stored at `solvay_test/ParseMaps` and `solvay_test/HQ`  
 - Paste then enhanced faces back to the original image `solvay_test/hq_final.jpg`  
+- You may use `--test_upscale` to upscale the final output.
 
 ### Test image folder 
 To test multiple images, we first crop out all the faces and align them use the following script.  
@@ -42,7 +43,8 @@ And then parse the aligned faces and enhance them with
 ```
 python test_enhance_dir_align.py --dataroot test_align_results --results_dir test_enhance_results
 ```  
-This is used to test a large amounts of data, so we do not paste the faces back.
+Results will be saved to three folders respectively: `lq`, `parse`, `lq`.   
+*Note: This is used to test a large amounts of data, so we do not paste the faces back.*
 
 ## Citation
 ```
