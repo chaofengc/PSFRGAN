@@ -6,7 +6,7 @@
 [Chaofeng Chen](https://chaofengc.github.io), [Xiaoming Li](https://csxmli2016.github.io/), [Lingbo Yang](https://lotayou.github.io), Xianhui Lin, [Lei Zhang](https://www4.comp.polyu.edu.hk/~cslzhang/), [Kwan-Yee K. Wong](https://i.cs.hku.hk/~kykwong/)
 
 ![](test_dir/test_hzgg.jpg)
-![](test_hzgg/hq_final.jpg)
+![](test_hzgg_results/hq_final.jpg)
 
 ## Getting Started
 
@@ -28,25 +28,25 @@ Download the pretrained models from the following link and put them to `./pretra
 ### Test single image
 Run the following script to enhance face(s) in single input  
 ```
-python test_enhance_single_unalign.py --test_img_path ./test_dir/Solvay_conference_1927.jpg --results_dir solvay_test --gpus 1
+python test_enhance_single_unalign.py --test_img_path ./test_dir/test_hzgg.jpg --results_dir test_hzgg_results --gpus 1
 ```
 
 This script do the following things:
-- Crop and align all the faces from input image, stored at `solvay_test/LQ_faces`  
-- Parse these faces and then enhance them, results stored at `solvay_test/ParseMaps` and `solvay_test/HQ`  
-- Paste then enhanced faces back to the original image `solvay_test/hq_final.jpg`  
+- Crop and align all the faces from input image, stored at `results_dir/LQ_faces`  
+- Parse these faces and then enhance them, results stored at `results_dir/ParseMaps` and `results_dir/HQ`  
+- Paste then enhanced faces back to the original image `results_dir/hq_final.jpg`  
 - You can use `--gpus` to specify how many GPUs to use, `<=0` means running on CPU. The program will use GPU with the most available memory. Set `CUDA_VISIBLE_DEVICE` to specify the GPU if you do not want automatic GPU selection.  
 
 ### Test image folder 
 To test multiple images, we first crop out all the faces and align them use the following script.  
 ```
-python align_and_crop_dir.py --src_dir test_dir --results_dir test_align_results
+python align_and_crop_dir.py --src_dir test_dir --results_dir test_dir_align_results
 ```  
 
 For images (*e.g.* `multiface_test.jpg`) contain multiple faces, the aligned faces will be stored as `multiface_test_{face_index}.jpg`  
 And then parse the aligned faces and enhance them with  
 ```
-python test_enhance_dir_align.py --dataroot test_align_results --results_dir test_enhance_results
+python test_enhance_dir_align.py --dataroot test_dir_align_results --results_dir test_dir_enhance_results
 ```  
 Results will be saved to three folders respectively: `results_dir/lq`, `results_dir/parse`, `results_dir/hq`.   
 *Note: This is used to test a large amounts of data, and we do not paste the faces back.*
