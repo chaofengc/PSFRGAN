@@ -40,7 +40,7 @@ def detect_and_align_faces(img, face_detector, lmk_predictor, template_path, tem
         single_points = np.array(single_points)
         tform = trans.SimilarityTransform()
         tform.estimate(single_points, ref_points)
-        tmp_face = trans.warp(img, tform.inverse, output_shape=align_out_size)
+        tmp_face = trans.warp(img, tform.inverse, output_shape=align_out_size, order=3)
         aligned_faces.append(tmp_face*255)
         tform_params.append(tform)
     return [aligned_faces, tform_params]
@@ -58,7 +58,7 @@ def enhance_faces(LQ_faces, model):
     hq_faces = []
     lq_parse_maps = []
     for lq_face in tqdm(LQ_faces):
-        lq_tensor = torch.tensor(lq_face.transpose(2, 0, 1)) / 255 * 2 - 1
+        lq_tensor = torch.tensor(lq_face.transpose(2, 0, 1)) / 255. * 2 - 1
         lq_tensor = lq_tensor.unsqueeze(0).float().to(model.device)
         parse_map, _ = model.netP(lq_tensor)
         parse_map_onehot = (parse_map == parse_map.max(dim=1, keepdim=True)[0]).float()
@@ -68,9 +68,12 @@ def enhance_faces(LQ_faces, model):
     return hq_faces, lq_parse_maps
 
 
-def past_faces_back(img, hq_faces, tform_params):
+def past_faces_back(img, hq_faces, tform_params, upscale=1):
+    h, w = img.shape[:2]
+    img = cv2.resize(img, (int(w*upscale), int(h*upscale)), interpolation=cv2.INTER_CUBIC)
     for hq_img, tform in tqdm(zip(hq_faces, tform_params), total=len(hq_faces)):
-        back_img = trans.warp(hq_img/255, tform, output_shape=img.shape[:2]) * 255
+        tform.params[0:2,0:2] /= upscale
+        back_img = trans.warp(hq_img/255., tform, output_shape=[int(h*upscale), int(w*upscale)], order=3) * 255
         
         # blur mask to avoid border artifacts
         mask = (back_img == 0) 
@@ -114,7 +117,7 @@ if __name__ == '__main__':
     save_imgs(hq_faces, save_hq_dir)
 
     print('======> Paste the enhanced faces back to the original image.')
-    hq_img = past_faces_back(img, hq_faces, tform_params) 
+    hq_img = past_faces_back(img, hq_faces, tform_params, upscale=opt.test_upscale) 
     final_save_path = os.path.join(opt.results_dir, 'hq_final.jpg') 
     print('======> Save final result to', final_save_path)
     io.imsave(final_save_path, hq_img)
