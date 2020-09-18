@@ -5,6 +5,9 @@
 [Progressive Semantic-Aware Style Transformation for Blind Face Restoration]()  
 [Chaofeng Chen](https://chaofengc.github.io), [Xiaoming Li](https://csxmli2016.github.io/), [Lingbo Yang](https://lotayou.github.io), Xianhui Lin, [Lei Zhang](https://www4.comp.polyu.edu.hk/~cslzhang/), [Kwan-Yee K. Wong](https://i.cs.hku.hk/~kykwong/)
 
+![](test_dir/test_hzgg.jpg)
+![](test_hzgg/hq_final.jpg)
+
 ## Getting Started
 
 ### Prerequisites and Installation
