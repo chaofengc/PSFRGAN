@@ -43,7 +43,7 @@ And then parse the aligned faces and enhance them with
 ```
 python test_enhance_dir_align.py --dataroot test_align_results --results_dir test_enhance_results
 ```  
-Results will be saved to three folders respectively: `lq`, `parse`, `lq`.   
+Results will be saved to three folders respectively: `lq`, `parse`, `hq`.   
 *Note: This is used to test a large amounts of data, so we do not paste the faces back.*
 
 ## Citation
