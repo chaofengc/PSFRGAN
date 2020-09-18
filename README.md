@@ -18,7 +18,9 @@
     ```
 
 ### Download Pretrain Models and Dataset
-Coming soon.
+Download the pretrained models from the following link and put them to `./pretrain_models`  
+- [GoogleDrive](https://drive.google.com/drive/folders/1Ubejhxd2xd4fxGc_M_LWl3Ux6CgQd9rP?usp=sharing)
+- [BaiduNetDisk](https://pan.baidu.com/s/1_5MzYnhkUOrV35A_sBKulw), extract code: `4uip`
 
 ### Test single image
 Run the following script to enhance face(s) in single input  
