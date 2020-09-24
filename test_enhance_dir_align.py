@@ -41,17 +41,17 @@ if __name__ == '__main__':
             output_sr_img = utils.batch_tensor_to_img(output_SR)
             ref_parse_img = utils.color_parse_map(parse_map_sm)
 
-            save_path = os.path.join(save_dir, 'lq', img_path[i].split('/')[-1]) 
+            save_path = os.path.join(save_dir, 'lq', os.path.basename(img_path[i]))
             os.makedirs(os.path.join(save_dir, 'lq'), exist_ok=True)
             save_img = Image.fromarray(inp_img[i])
             save_img.save(save_path)
 
-            save_path = os.path.join(save_dir, 'hq', img_path[i].split('/')[-1]) 
+            save_path = os.path.join(save_dir, 'hq', os.path.basename(img_path[i]))
             os.makedirs(os.path.join(save_dir, 'hq'), exist_ok=True)
             save_img = Image.fromarray(output_sr_img[i])
             save_img.save(save_path)
 
-            save_path = os.path.join(save_dir, 'parse', img_path[i].split('/')[-1]) 
+            save_path = os.path.join(save_dir, 'parse', os.path.basename(img_path[i]))
             os.makedirs(os.path.join(save_dir, 'parse'), exist_ok=True)
             save_img = Image.fromarray(ref_parse_img[i])
             save_img.save(save_path)

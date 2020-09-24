@@ -1,5 +1,7 @@
 check_points/
 pretrain_models/
+test_dir_enhance_results/
+test_dir_align_results/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
