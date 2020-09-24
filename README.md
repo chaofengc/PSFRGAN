@@ -2,7 +2,7 @@
 
 > We only provide test codes at this time. 
 
-[Progressive Semantic-Aware Style Transformation for Blind Face Restoration]()  
+[Progressive Semantic-Aware Style Transformation for Blind Face Restoration](https://arxiv.org/abs/2009.08709)  
 [Chaofeng Chen](https://chaofengc.github.io), [Xiaoming Li](https://csxmli2016.github.io/), [Lingbo Yang](https://lotayou.github.io), Xianhui Lin, [Lei Zhang](https://www4.comp.polyu.edu.hk/~cslzhang/), [Kwan-Yee K. Wong](https://i.cs.hku.hk/~kykwong/)
 
 ![](test_dir/test_hzgg.jpg)
@@ -56,6 +56,7 @@ Results will be saved to three folders respectively: `results_dir/lq`, `results_
 @InProceedings{ChenPSFRGAN,
     author = {Chen, Chaofeng and Li, Xiaoming and Lin, Xianhui and Lingbo, Yang and Zhang, Lei and Wong, KKY},
     title = {Progressive Semantic-Aware Style Transformation for Blind Face Restoration},
+    Journal = {arXiv preprint arXiv:2009.08709},
     year = {2020}
 }
 ```
