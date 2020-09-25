@@ -46,10 +46,17 @@ python align_and_crop_dir.py --src_dir test_dir --results_dir test_dir_align_res
 For images (*e.g.* `multiface_test.jpg`) contain multiple faces, the aligned faces will be stored as `multiface_test_{face_index}.jpg`  
 And then parse the aligned faces and enhance them with  
 ```
-python test_enhance_dir_align.py --dataroot test_dir_align_results --results_dir test_dir_enhance_results
+python test_enhance_dir_align.py --src_dir test_dir_align_results --results_dir test_dir_enhance_results
 ```  
 Results will be saved to three folders respectively: `results_dir/lq`, `results_dir/parse`, `results_dir/hq`.   
-*Note: This is used to test a large amounts of data, and we do not paste the faces back.*
+
+### Additional test script
+
+For your convenience, we also provide script to test multiple unaligned images and paste the enhance results back. **Note the paste back operation could be quite slow for large size images containing many faces.**
+```
+python test_enhance_dir_unalign.py --src_dir test_dir --results_dir test_unalign_results
+```  
+This script basically do the same thing as `test_enhance_single_unalign.py` for each image in `src_dir`
 
 ## Citation
 ```

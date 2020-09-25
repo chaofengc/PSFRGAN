@@ -9,6 +9,7 @@ class TestOptions(BaseOptions):
 
     def initialize(self, parser):
         parser = BaseOptions.initialize(self, parser)  # define shared options
+        parser.add_argument('--src_dir', type=str, default='', help='source directory containing test images')
         parser.add_argument('--test_img_path', type=str, default='', help='path for single image test')
         parser.add_argument('--test_upscale', type=float, default=1, help='upsample scale for single image test')
         parser.add_argument('--ntest', type=int, default=float("inf"), help='# of test examples.')
