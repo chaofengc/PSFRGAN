@@ -1,3 +1,5 @@
+import matplotlib
+matplotlib.use('Agg')
 import torch
 import numpy as np
 import cv2 as cv
@@ -9,6 +11,12 @@ import gzip
 
 MASK_COLORMAP = [[0, 0, 0], [204, 0, 0], [76, 153, 0], [204, 204, 0], [51, 51, 255], [204, 0, 204], [0, 255, 255], [255, 204, 204], [102, 51, 0], [255, 0, 0], [102, 204, 0], [255, 255, 0], [0, 0, 153], [0, 0, 204], [255, 51, 153], [0, 204, 204], [0, 51, 0], [255, 153, 51], [0, 204, 0]]
 
+label_list = ['skin', 'nose', 'eye_g', 'l_eye', 'r_eye', 'l_brow', 'r_brow', 'l_ear', 'r_ear', 'mouth', 'u_lip', 'l_lip', 'hair', 'hat', 'ear_r', 'neck_l', 'neck', 'cloth']
+
+def array_to_heatmap(x):
+    x = (x - x.min()) / (x.max() - x.min()) * 255
+    x = x.astype(np.uint8)
+    return cv.applyColorMap(x.astype(np.uint8), cv.COLORMAP_RAINBOW)
 
 def img_to_tensor(img_path, device, size=None, mode='rgb'):
     """
@@ -80,7 +88,7 @@ def batch_tensor_to_img(tensor, size=None):
     out_imgs = batch_numpy_to_image(arrays, size)
     return out_imgs 
 
-def color_parse_map(tensor):
+def color_parse_map(tensor, size=None):
     """
     input: tensor or batch tensor
     return: colorized parsing maps
@@ -96,9 +104,27 @@ def color_parse_map(tensor):
         tmp_img = np.zeros(tensor.shape[1:] + (3,))        
         for idx, color in enumerate(MASK_COLORMAP):
             tmp_img[t == idx] = color
+        if size is not None:
+            tmp_img = cv.resize(tmp_img, (size, size))
         color_maps.append(tmp_img.astype(np.uint8))
     return color_maps
 
+def onehot_parse_map(img):
+    """
+    input: RGB color parse map
+    output: one hot encoding of parse map
+    """
+    n_label = len(MASK_COLORMAP)
+    img = np.array(img, dtype=np.uint8)
+    h, w = img.shape[:2]
+    onehot_label = np.zeros((n_label, h, w))
+    colormap = np.array(MASK_COLORMAP).reshape(n_label, 1, 1, 3)
+    colormap = np.tile(colormap, (1, h, w, 1))
+    for idx, color in enumerate(MASK_COLORMAP):
+        tmp_label = colormap[idx] == img
+        onehot_label[idx] = tmp_label[..., 0] * tmp_label[..., 1] * tmp_label[..., 2]
+    return onehot_label
+ 
 
 def mkdirs(paths):
     if isinstance(paths, list) and not isinstance(paths, str):
@@ -108,6 +134,24 @@ def mkdirs(paths):
     else:
         if not os.path.exists(paths):
             os.makedirs(paths)
+
+def select_yx(featmap, y, x):
+    """
+    Select x, y coordinates from feature map.
+    Args size:
+        featmap: (B, C, H, W)
+        x: (B, C)
+        y: (B, C)
+    """
+    assert featmap.shape[:2] == x.shape == y.shape, 'X, Y coordinates should match.'
+    x = torch.clamp(x, 0, featmap.shape[-1] - 1)
+    y = torch.clamp(y, 0, featmap.shape[-2] - 1)
+    b, c, h, w = featmap.shape
+    y = y.view(b, c, 1, 1).repeat(1, 1, 1, w)
+    featmap = torch.gather(featmap, -2, y.long())
+    x = x.view(b, c, 1, 1)
+    featmap = torch.gather(featmap, -1, x.long()) 
+    return featmap.squeeze(-1).squeeze(-1)
 
 
 def get_gpu_memory_map():
@@ -141,7 +185,6 @@ def save(obj, save_path):
     with gzip.GzipFile(save_path, 'wb') as f:
         torch.save(obj, f)
 
-
 def load(read_path):
     if read_path.endswith('.gzip'):
         with gzip.open(read_path, 'rb') as f:
@@ -149,5 +192,14 @@ def load(read_path):
     else:
         weight = torch.load(read_path)
     return weight
+
+
+if __name__ == '__main__':
+    hm = torch.randn(32, 68, 128, 128).cuda()
+    flip(hm, 2)
+    x = torch.ones(32, 68)
+    y = torch.ones(32, 68)
+    print(get_gpu_memory_map())
+
 
 

@@ -123,8 +123,10 @@ class BaseModel(ABC):
         print('learning rate = %.7f' % lr)
 
     def get_lr(self,):
-        lr = self.optimizers[0].param_groups[0]['lr']
-        return {'LR': lr} 
+        lrs = {} 
+        for idx, p in enumerate(self.optimizers):
+            lrs['LR{}'.format(idx)] = p.param_groups[0]['lr']
+        return lrs
 
     def get_current_visuals(self):
         """Return visualization images. train.py will display these images with visdom, and save the images to a HTML"""
@@ -155,8 +157,13 @@ class BaseModel(ABC):
                 net = getattr(self, 'net' + name)
 
                 if len(self.gpu_ids) > 0 and torch.cuda.is_available():
-                    torch.save(net.module.cpu().state_dict(), save_path)
-                    net.cuda(self.gpu_ids[0])
+                    if self.opt.distributed:
+                        torch.save(net.module.state_dict(), save_path)
+                        print('Model saved in:', save_filename)
+                    else:
+                        torch.save(net.module.cpu().state_dict(), save_path)
+                        print('Model saved in:', save_filename)
+                        net.cuda(self.gpu_ids[0])
                 else:
                     torch.save(net.cpu().state_dict(), save_path)
         if info is not None:
@@ -182,29 +189,39 @@ class BaseModel(ABC):
         Parameters:
             epoch (int) -- current epoch; used in the file name '%s_net_%s.pth' % (epoch, name)
         """
-        for name in self.model_names:
+        for name in self.load_model_names:
             if isinstance(name, str):
                 load_filename = '%s_net_%s.pth' % (epoch, name)
                 load_path = os.path.join(self.save_dir, load_filename)
                 net = getattr(self, 'net' + name)
-                if isinstance(net, torch.nn.DataParallel):
+                if isinstance(net, torch.nn.DataParallel) or isinstance(net, torch.nn.parallel.DistributedDataParallel):
                     net = net.module
                 print('loading the model from %s' % load_path)
                 # if you are using PyTorch newer than 0.4 (e.g., built from
                 # GitHub source), you can remove str() on self.device
-                state_dict = torch.load(load_path, map_location=str(self.device))
+                if self.opt.distributed:
+                    map_location = {'cuda:%d' % 0: 'cuda:%d' % self.opt.local_rank}
+                else:
+                    map_location = str(self.device)
+
+                state_dict = torch.load(load_path, map_location=map_location)
 
                 # patch InstanceNorm checkpoints prior to 0.4
                 #  for key in list(state_dict.keys()):  # need to copy keys here because we mutate in loop
                     #  self.__patch_instance_norm_state_dict(state_dict, net, key.split('.'))
                 #  net.load_state_dict(state_dict)
-                
+                if not self.opt.no_strict_load:
+                    net.load_state_dict(state_dict)
                 #  Load partial weights
-                model_dict = net.state_dict()
-                pretrained_dict = {k: v for k, v in state_dict.items() if k in model_dict}
-                model_dict.update(pretrained_dict)
-                net.load_state_dict(model_dict)
+                else:
+                    model_dict = net.state_dict()
+                    pretrained_dict = {k: v for k, v in state_dict.items() if k in model_dict}
+                    model_dict.update(pretrained_dict)
+                    net.load_state_dict(model_dict, strict=False)
 
+                if self.opt.distributed:
+                    torch.distributed.barrier()
+                
         info_path = os.path.join(self.save_dir, '%s.info' % epoch)
         if os.path.exists(info_path):
             info_dict = torch.load(info_path)
@@ -224,8 +241,6 @@ class BaseModel(ABC):
                 num_params = 0
                 for param in net.parameters():
                     num_params += param.numel()
-                if verbose:
-                    print(net)
                 print('[Network %s] Total number of parameters : %.3f M' % (name, num_params / 1e6))
         print('-----------------------------------------------')
 

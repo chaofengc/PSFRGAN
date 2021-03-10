@@ -200,11 +200,10 @@ class RegionStyleLoss(nn.Module):
 
     def forward(self, x_feats, y_feats, mask):
         loss = 0
-        for xf, yf in zip(x_feats, y_feats):
+        for xf, yf in zip(x_feats[2:], y_feats[2:]):
             tmp_mask = torch.nn.functional.interpolate(mask, xf.shape[2:])
             xf_gm = self.__layer_gram_matrix(xf, tmp_mask)
             yf_gm = self.__layer_gram_matrix(yf, tmp_mask)
-            print(xf_gm.shape, yf_gm.shape)
             tmp_loss = self.mse(xf_gm, yf_gm.detach())
             loss = loss + tmp_loss
         return loss

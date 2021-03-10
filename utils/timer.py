@@ -11,6 +11,9 @@ class Timer():
         self.before = time.time() 
         self.timer = OrderedDict() 
 
+    def restart(self):
+        self.before = time.time() 
+
     def update_time(self, key):
         self.timer[key] = time.time() - self.before
         self.before = time.time()

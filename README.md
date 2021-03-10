@@ -8,9 +8,7 @@
 ![](test_dir/test_hzgg.jpg)
 ![](test_hzgg_results/hq_final.jpg)
 
-## Getting Started
-
-### Prerequisites and Installation
+## Prerequisites and Installation
 - Ubuntu 18.04
 - CUDA 10.1  
 - Clone this repository
@@ -19,6 +17,8 @@
     cd PSFR-GAN
     ```
 - Python 3.7, install required packages by `pip3 install -r requirements.txt`  
+
+## Quick Test
 
 ### Download Pretrain Models and Dataset
 Download the pretrained models from the following link and put them to `./pretrain_models`  
@@ -58,13 +58,17 @@ python test_enhance_dir_unalign.py --src_dir test_dir --results_dir test_unalign
 ```  
 This script basically do the same thing as `test_enhance_single_unalign.py` for each image in `src_dir`
 
+## Train the Model
+
+
+
 ## Citation
 ```
-@InProceedings{ChenPSFRGAN,
-    author = {Chen, Chaofeng and Li, Xiaoming and Lin, Xianhui and Lingbo, Yang and Zhang, Lei and Wong, KKY},
+@inproceedings{ChenPSFRGAN,
+    author = {Chen, Chaofeng and Li, Xiaoming and Lingbo, Yang and Lin, Xianhui and Zhang, Lei and Wong, KKY},
     title = {Progressive Semantic-Aware Style Transformation for Blind Face Restoration},
-    Journal = {arXiv preprint arXiv:2009.08709},
-    year = {2020}
+    Journal = {IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
+    year = {2021}
 }
 ```
 

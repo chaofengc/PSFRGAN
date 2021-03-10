@@ -63,7 +63,7 @@ def enhance_faces(LQ_faces, model):
             lq_tensor = lq_tensor.unsqueeze(0).float().to(model.device)
             parse_map, _ = model.netP(lq_tensor)
             parse_map_onehot = (parse_map == parse_map.max(dim=1, keepdim=True)[0]).float()
-            _, output_SR = model.netG(lq_tensor, parse_map_onehot)
+            output_SR = model.netG(lq_tensor, parse_map_onehot)
         hq_faces.append(utils.tensor_to_img(output_SR))
         lq_parse_maps.append(utils.color_parse_map(parse_map_onehot)[0])
     return hq_faces, lq_parse_maps

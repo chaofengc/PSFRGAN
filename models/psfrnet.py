@@ -29,7 +29,10 @@ class SPADENorm(nn.Module):
       
     def forward(self, x, ref):
         normalized_input = self.param_free_norm(x)
-        ref = nn.functional.interpolate(ref, x.shape[2:], mode='nearest')
+        if x.shape[-1] != ref.shape[-1]:
+            #  ref = nn.functional.adaptive_max_pool2d(ref, x.shape[2:])
+            #  ref = nn.functional.adaptive_avg_pool2d(ref, x.shape[2:])
+            ref = nn.functional.interpolate(ref, x.shape[2:], mode='bicubic', align_corners=False)
         if self.norm_type == 'spade':
             gamma, beta = self.get_gamma_beta(ref, self.conv1, self.gamma_conv, self.beta_conv)
             return normalized_input * gamma + beta
@@ -69,6 +72,7 @@ class PSFRGenerator(nn.Module):
 
         self.const_input = nn.Parameter(torch.randn(1, get_ch(min_feat_size), min_feat_size, min_feat_size)) 
         up_steps = int(np.log2(out_size//min_feat_size))
+        self.up_steps = up_steps
 
         ref_ch = 19+3 
 
@@ -79,8 +83,6 @@ class PSFRGenerator(nn.Module):
                 ]
 
         body = []
-        to_rgb = []
-        to_rgb.append(nn.Conv2d(head_ch, output_nc, kernel_size=3, padding=1))
         for i in range(up_steps):
             cin, cout = ch_clip(head_ch), ch_clip(head_ch // 2) 
             body += [
@@ -90,16 +92,14 @@ class PSFRGenerator(nn.Module):
                         SPADEResBlock(cout, cout, ref_ch, relu_type, norm_type)
                         )
                     ]
-            to_rgb.append(nn.Conv2d(cout, output_nc, kernel_size=3, padding=1))
             head_ch = head_ch // 2
 
         self.img_out = nn.Conv2d(ch_clip(head_ch), output_nc, kernel_size=3, padding=1)
 
         self.head = nn.Sequential(*head)
         self.body = nn.Sequential(*body)
-        self.to_rgb = nn.ModuleList(to_rgb)
         self.upsample = nn.Upsample(scale_factor=2)
-
+        
     def forward_spade(self, net, x, ref):
         for m in net:
             x = self.forward_spade_m(m, x, ref)
@@ -116,19 +116,37 @@ class PSFRGenerator(nn.Module):
         b, c, h, w = x.shape
         const_input = self.const_input.repeat(b, 1, 1, 1)
         ref_input = torch.cat((x, ref), dim=1)
-
-        out_imgs = []
+        
         feat = self.forward_spade(self.head, const_input, ref_input)
-        out_imgs.append(self.to_rgb[0](feat))
 
         for idx, m in enumerate(self.body):
             feat = self.forward_spade(m, feat, ref_input) 
-            out_imgs.append(self.to_rgb[idx+1](feat))
 
-        out_img = out_imgs[0]
-        for img in out_imgs[1:]:
-            out_img = self.upsample(out_img) + img 
+        #  ref_inputs = [ref_input]
+        #  tmp = ref_input
+        #  for i in range(self.up_steps):
+            #  tmp = self.downsample(tmp)
+            #  ref_inputs.append(tmp)
+        #  ref_inputs = ref_inputs[::-1]
 
-        return None, out_img 
+        #  out_imgs = []
+        #  feat = self.forward_spade(self.head, const_input, ref_inputs[0])
+        #  out_imgs.append(self.to_rgb[0](feat))
+
+        #  for idx, m in enumerate(self.body):
+            #  feat = self.forward_spade(m, feat, ref_inputs[idx + 1]) 
+            #  out_imgs.append(self.to_rgb[idx+1](feat))
+
+        #  out_img = out_imgs[0]
+        #  for img in out_imgs[1:]:
+            #  out_img = self.upsample(out_img) + img 
+
+        #  out_img = out_imgs[-1]
+        out_img = self.img_out(feat)
+
+        return out_img 
 
 
+if __name__ == '__main__':
+    x = torch.randn(2, 16, 567, 234)
+    nearest_interpolate(x)

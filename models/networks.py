@@ -107,7 +107,7 @@ def define_P(opt, in_size=512, out_size=512, min_feat_size=32, relu_type='LeakyR
     if len(opt.gpu_ids) > 0:
         assert(torch.cuda.is_available())
         net.to(opt.device)
-        net = torch.nn.DataParallel(net, opt.gpu_ids, output_device=opt.data_device)
+        net = torch.nn.DataParallel(net, opt.gpu_ids, output_device=opt.device)
     return net
 
 
@@ -119,20 +119,20 @@ def define_G(opt, isTrain=True, use_norm='none', relu_type='LeakyReLU'):
     if len(opt.gpu_ids) > 0:
         assert(torch.cuda.is_available())
         net.to(opt.device)
-        net = torch.nn.DataParallel(net, opt.gpu_ids, output_device=opt.data_device)
+        net = torch.nn.DataParallel(net, opt.gpu_ids, output_device=opt.device)
     #  init_weights(net, init_type='normal', init_gain=0.02)
     return net
 
 
 def define_D(opt, in_channel=3, isTrain=True, use_norm='none'):
-    net = MultiScaleDiscriminator(in_channel, opt.ndf, opt.n_layers_D, opt.Dnorm, num_D=opt.D_num, ref_ch=19)
+    net = MultiScaleDiscriminator(in_channel, opt.ndf, opt.n_layers_D, opt.Dnorm, num_D=opt.D_num)
     apply_norm(net, use_norm)
     if not isTrain:
         net.eval()
     if len(opt.gpu_ids) > 0:
         assert(torch.cuda.is_available())
         net.to(opt.device)
-        net = torch.nn.DataParallel(net, opt.gpu_ids, output_device=opt.data_device)
+        net = torch.nn.DataParallel(net, opt.gpu_ids, output_device=opt.device)
     init_weights(net, init_type='normal', init_gain=0.02)
     return net
 
@@ -195,12 +195,12 @@ class ParseNet(nn.Module):
 
 
 class MultiScaleDiscriminator(nn.Module):
-    def __init__(self, input_ch, base_ch=64, n_layers=3, norm_type='none', relu_type='LeakyReLU', num_D=4, ref_ch=None):
+    def __init__(self, input_ch, base_ch=64, n_layers=3, norm_type='none', relu_type='LeakyReLU', num_D=4):
         super().__init__()
 
         self.D_pool = nn.ModuleList()
         for i in range(num_D):
-            netD = NLayerDiscriminator(input_ch, base_ch, depth=n_layers, norm_type=norm_type, relu_type=relu_type, ref_ch=ref_ch)
+            netD = NLayerDiscriminator(input_ch, base_ch, depth=n_layers, norm_type=norm_type, relu_type=relu_type)
             self.D_pool.append(netD)
 
         self.downsample = nn.AvgPool2d(3, stride=2, padding=[1, 1], count_include_pad=False)
@@ -223,13 +223,11 @@ class NLayerDiscriminator(nn.Module):
             depth = 4,
             norm_type = 'none',
             relu_type = 'LeakyReLU',
-            ref_ch = None,
             ):
         super().__init__()
 
-        nargs = {'norm_type': norm_type, 'relu_type': relu_type, 'ref_ch': ref_ch}
+        nargs = {'norm_type': norm_type, 'relu_type': relu_type}
         self.norm_type = norm_type
-        self.ref_ch = ref_ch
         self.input_ch = input_ch
 
         self.model = []
@@ -242,19 +240,13 @@ class NLayerDiscriminator(nn.Module):
         self.score_out = ConvLayer(cout, 1, use_pad=False)
 
     def forward(self, x, return_feat=False):
-        if self.norm_type == 'spade':
-            assert x.shape[1] == self.input_ch + self.ref_ch, 'channels == input_ch + ref_ch' 
-            x, ref = x[:, :self.input_ch], x[:, self.input_ch:]
-
         ret_feats = []
         for idx, m in enumerate(self.model):
-            if m.norm_type == 'spade':
-                m.set_ref(ref)
             x = m(x)
             ret_feats.append(x)
         x = self.score_out(x)
         if return_feat:
-            return x, ret_feats[1:]
+            return x, ret_feats
         else:
             return x
 

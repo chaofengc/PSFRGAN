@@ -34,7 +34,7 @@ if __name__ == '__main__':
         with torch.no_grad():
             parse_map, _ = netP(inp)
             parse_map_sm = (parse_map == parse_map.max(dim=1, keepdim=True)[0]).float()
-            output_parse, output_SR = netG(inp, parse_map_sm)
+            output_SR = netG(inp, parse_map_sm)
         img_path = data['LR_paths']     # get image paths
         for i in tqdm(range(len(img_path))):
             inp_img = utils.batch_tensor_to_img(inp)
