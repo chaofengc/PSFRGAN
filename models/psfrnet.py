@@ -30,8 +30,6 @@ class SPADENorm(nn.Module):
     def forward(self, x, ref):
         normalized_input = self.param_free_norm(x)
         if x.shape[-1] != ref.shape[-1]:
-            #  ref = nn.functional.adaptive_max_pool2d(ref, x.shape[2:])
-            #  ref = nn.functional.adaptive_avg_pool2d(ref, x.shape[2:])
             ref = nn.functional.interpolate(ref, x.shape[2:], mode='bicubic', align_corners=False)
         if self.norm_type == 'spade':
             gamma, beta = self.get_gamma_beta(ref, self.conv1, self.gamma_conv, self.beta_conv)
@@ -122,26 +120,6 @@ class PSFRGenerator(nn.Module):
         for idx, m in enumerate(self.body):
             feat = self.forward_spade(m, feat, ref_input) 
 
-        #  ref_inputs = [ref_input]
-        #  tmp = ref_input
-        #  for i in range(self.up_steps):
-            #  tmp = self.downsample(tmp)
-            #  ref_inputs.append(tmp)
-        #  ref_inputs = ref_inputs[::-1]
-
-        #  out_imgs = []
-        #  feat = self.forward_spade(self.head, const_input, ref_inputs[0])
-        #  out_imgs.append(self.to_rgb[0](feat))
-
-        #  for idx, m in enumerate(self.body):
-            #  feat = self.forward_spade(m, feat, ref_inputs[idx + 1]) 
-            #  out_imgs.append(self.to_rgb[idx+1](feat))
-
-        #  out_img = out_imgs[0]
-        #  for img in out_imgs[1:]:
-            #  out_img = self.upsample(out_img) + img 
-
-        #  out_img = out_imgs[-1]
         out_img = self.img_out(feat)
 
         return out_img 

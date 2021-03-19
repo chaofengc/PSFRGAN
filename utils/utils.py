@@ -1,5 +1,3 @@
-import matplotlib
-matplotlib.use('Agg')
 import torch
 import numpy as np
 import cv2 as cv
@@ -7,7 +5,6 @@ from skimage import io
 from PIL import Image
 import os
 import subprocess
-import gzip
 
 MASK_COLORMAP = [[0, 0, 0], [204, 0, 0], [76, 153, 0], [204, 204, 0], [51, 51, 255], [204, 0, 204], [0, 255, 255], [255, 204, 204], [102, 51, 0], [255, 0, 0], [102, 204, 0], [255, 255, 0], [0, 0, 153], [0, 0, 204], [255, 51, 153], [0, 204, 204], [0, 51, 0], [255, 153, 51], [0, 204, 0]]
 
@@ -135,24 +132,6 @@ def mkdirs(paths):
         if not os.path.exists(paths):
             os.makedirs(paths)
 
-def select_yx(featmap, y, x):
-    """
-    Select x, y coordinates from feature map.
-    Args size:
-        featmap: (B, C, H, W)
-        x: (B, C)
-        y: (B, C)
-    """
-    assert featmap.shape[:2] == x.shape == y.shape, 'X, Y coordinates should match.'
-    x = torch.clamp(x, 0, featmap.shape[-1] - 1)
-    y = torch.clamp(y, 0, featmap.shape[-2] - 1)
-    b, c, h, w = featmap.shape
-    y = y.view(b, c, 1, 1).repeat(1, 1, 1, w)
-    featmap = torch.gather(featmap, -2, y.long())
-    x = x.view(b, c, 1, 1)
-    featmap = torch.gather(featmap, -1, x.long()) 
-    return featmap.squeeze(-1).squeeze(-1)
-
 
 def get_gpu_memory_map():
     """Get the current gpu usage within visible cuda devices.
@@ -177,21 +156,6 @@ def get_gpu_memory_map():
         visible_devices = range(len(gpu_memory))
     gpu_memory_map = dict(zip(range(len(visible_devices)), gpu_memory[visible_devices]))
     return gpu_memory_map, sorted(gpu_memory_map, key=gpu_memory_map.get)
-
-
-def save(obj, save_path):
-    for k in obj.keys():
-        obj[k] = obj[k].to('cpu')
-    with gzip.GzipFile(save_path, 'wb') as f:
-        torch.save(obj, f)
-
-def load(read_path):
-    if read_path.endswith('.gzip'):
-        with gzip.open(read_path, 'rb') as f:
-            weight = torch.load(f)
-    else:
-        weight = torch.load(read_path)
-    return weight
 
 
 if __name__ == '__main__':
