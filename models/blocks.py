@@ -78,6 +78,7 @@ class ConvLayer(nn.Module):
             bias = False
         
         stride = 2 if scale == 'down' else 1
+        self.scale = scale
 
         self.scale_func = lambda x: x
         if scale == 'up':
@@ -86,6 +87,7 @@ class ConvLayer(nn.Module):
         self.reflection_pad = nn.ReflectionPad2d(int(np.ceil((kernel_size - 1.)/2))) 
         self.conv2d = nn.Conv2d(in_channels, out_channels, kernel_size, stride, bias=bias)
 
+        self.avgpool = nn.AvgPool2d(2, 2)
         self.relu = ReluLayer(out_channels, relu_type)
         self.norm = NormLayer(out_channels, norm_type=norm_type)
 
@@ -94,6 +96,8 @@ class ConvLayer(nn.Module):
         if self.use_pad:
             out = self.reflection_pad(out)
         out = self.conv2d(out)
+        if self.scale == 'down_avg':
+            out = self.avgpool(out)
         out = self.norm(out)
         out = self.relu(out)
         return out

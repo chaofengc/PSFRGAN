@@ -235,7 +235,7 @@ class NLayerDiscriminator(nn.Module):
         for i in range(depth):
             cin  = min(base_ch * 2**(i), max_ch)
             cout = min(base_ch * 2**(i+1), max_ch)
-            self.model.append(ConvLayer(cin, cout, scale='down', **nargs))
+            self.model.append(ConvLayer(cin, cout, scale='down_avg', **nargs))
         self.model = nn.Sequential(*self.model)
         self.score_out = ConvLayer(cout, 1, use_pad=False)
 

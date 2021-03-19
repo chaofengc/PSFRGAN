@@ -33,7 +33,7 @@ class ParseModel(BaseModel):
             self.optimizer = torch.optim.Adam(self.netP.parameters(), lr=opt.lr, betas=(0.9, 0.999))
             self.optimizers = [self.optimizer]
 
-    def set_input(self, input):
+    def set_input(self, input, cur_iters=None):
         self.img_LR = input['LR'].to(self.opt.device)
         self.img_HR = input['HR'].to(self.opt.device)
         self.gt_Parse = input['Mask'].to(self.opt.device)
