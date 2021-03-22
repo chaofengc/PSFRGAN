@@ -7,6 +7,7 @@
 ![](test_hzgg_results/hq_final.jpg)
 
 ### Changelog 
+- **2021.03.22**: Update new model at 15 epoch (52.5k iterations).
 - **2021.03.19**: Add train codes for PSFRGAN and FPN.
 
 ## Prerequisites and Installation
@@ -53,7 +54,7 @@ Results will be saved to three folders respectively: `results_dir/lq`, `results_
 
 ### Additional test script
 
-For your convenience, we also provide script to test multiple unaligned images and paste the enhance results back. **Note the paste back operation could be quite slow for large size images containing many faces.**
+For your convenience, we also provide script to test multiple unaligned images and paste the enhance results back. **Note the paste back operation could be quite slow for large size images containing many faces (dlib takes time to detect faces in large image).**
 ```
 python test_enhance_dir_unalign.py --src_dir test_dir --results_dir test_unalign_results
 ```  
@@ -92,8 +93,9 @@ You may also train your own FPN and generate masks for the HQ images by yourself
 - Download [CelebAHQ-Mask](https://github.com/switchablenorms/CelebAMask-HQ) dataset. Generate `CelebAMask-HQ-mask` and `CelebAMask-HQ-mask-color` with the provided scripts in `CelebAMask-HQ/face_parsing/Data_preprocessing/`.
 - Train FPN with the following commmand
 ```
-python train.py --gpus 2 --model parse --name FPN_v001 \
-    --batch_size 8 --dataset celebahqmask --dataroot ../datasets/CelebAHQ-Mask \
+python train.py --gpus 1 --model parse --name FPN_v001 \
+    --lr 0.0002 --batch_size 8 \
+    --dataset celebahqmask --dataroot ../datasets/CelebAMask-HQ \
     --visual_freq 100 --print_freq 10 #--continue_train
 ```
 - Generate parsing masks with your own FPN using the following command:

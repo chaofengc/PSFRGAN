@@ -71,7 +71,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--src_dir', type=str, help='source directory containing images to crop and align.')
     parser.add_argument('--results_dir', type=str, help='results directory to save the aligned faces.')
-    parser.add_argument('--not_use_cnn_detector', action='store_true', help='results directory to save the aligned faces.')
+    parser.add_argument('--not_use_cnn_detector', action='store_true', help='do not use cnn face detector in dlib.')
     args = parser.parse_args()
 
     src_dir = args.src_dir
