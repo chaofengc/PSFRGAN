@@ -157,13 +157,9 @@ class BaseModel(ABC):
                 net = getattr(self, 'net' + name)
 
                 if len(self.gpu_ids) > 0 and torch.cuda.is_available():
-                    if self.opt.distributed:
-                        torch.save(net.module.state_dict(), save_path)
-                        print('Model saved in:', save_filename)
-                    else:
-                        torch.save(net.module.cpu().state_dict(), save_path)
-                        print('Model saved in:', save_filename)
-                        net.cuda(self.gpu_ids[0])
+                    torch.save(net.module.cpu().state_dict(), save_path)
+                    print('Model saved in:', save_filename)
+                    net.cuda(self.gpu_ids[0])
                 else:
                     torch.save(net.cpu().state_dict(), save_path)
         if info is not None:
@@ -199,10 +195,7 @@ class BaseModel(ABC):
                 print('loading the model from %s' % load_path)
                 # if you are using PyTorch newer than 0.4 (e.g., built from
                 # GitHub source), you can remove str() on self.device
-                if self.opt.distributed:
-                    map_location = {'cuda:%d' % 0: 'cuda:%d' % self.opt.local_rank}
-                else:
-                    map_location = str(self.device)
+                map_location = str(self.device)
 
                 state_dict = torch.load(load_path, map_location=map_location)
 
@@ -218,9 +211,6 @@ class BaseModel(ABC):
                     pretrained_dict = {k: v for k, v in state_dict.items() if k in model_dict}
                     model_dict.update(pretrained_dict)
                     net.load_state_dict(model_dict, strict=False)
-
-                if self.opt.distributed:
-                    torch.distributed.barrier()
                 
         info_path = os.path.join(self.save_dir, '%s.info' % epoch)
         if os.path.exists(info_path):

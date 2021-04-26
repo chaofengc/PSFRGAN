@@ -7,6 +7,7 @@
 ![](test_hzgg_results/hq_final.jpg)
 
 ### Changelog 
+- **2021.04.26**: Add pytorch vgg19 model to GoogleDrive and remove `--distributed` option which causes training error.
 - **2021.03.22**: Update new model at 15 epoch (52.5k iterations).
 - **2021.03.19**: Add train codes for PSFRGAN and FPN.
 
