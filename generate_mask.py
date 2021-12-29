@@ -28,9 +28,8 @@ if __name__ == '__main__':
             parse_map, _ = netP(inp)
             parse_map_sm = (parse_map == parse_map.max(dim=1, keepdim=True)[0]).float()
         img_path = data['LR_paths']     # get image paths
+        ref_parse_img = utils.color_parse_map(parse_map_sm)
         for i in range(len(img_path)):
-            ref_parse_img = utils.color_parse_map(parse_map_sm)
-            
             save_path = os.path.join(opt.save_masks_dir, os.path.basename(img_path[i]))
             os.makedirs(opt.save_masks_dir, exist_ok=True)
             save_img = Image.fromarray(ref_parse_img[i])
