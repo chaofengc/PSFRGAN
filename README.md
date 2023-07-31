@@ -25,7 +25,7 @@
 
 ### Download Pretrain Models and Dataset
 Download the pretrained models from the following link and put them to `./pretrain_models`  
-- [GoogleDrive](https://drive.google.com/drive/folders/1Ubejhxd2xd4fxGc_M_LWl3Ux6CgQd9rP?usp=sharing)
+- [Github](https://github.com/chaofengc/PSFRGAN/releases/tag/v0.1.0)
 - [BaiduNetDisk](https://pan.baidu.com/s/1cru3uUASEfGX6p6L0_7gWQ), extract code: `gj2r`
 
 ### Test single image
