@@ -107,7 +107,7 @@ python generate_masks.py --save_masks_dir ../datasets/FFHQ/masks512 --batch_size
 ## Citation
 ```
 @inproceedings{ChenPSFRGAN,
-    author = {Chen, Chaofeng and Li, Xiaoming and Lingbo, Yang and Lin, Xianhui and Zhang, Lei and Wong, Kwan-Yee~K},
+    author = {Chen, Chaofeng and Li, Xiaoming and Lingbo, Yang and Lin, Xianhui and Zhang, Lei and Wong, Kwan-Yee~K.},
     title = {Progressive Semantic-Aware Style Transformation for Blind Face Restoration},
     Journal = {IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
     year = {2021}
